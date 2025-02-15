@@ -1,15 +1,19 @@
 package chess;
 
+import java.util.List;
+
 public abstract class Piece implements PieceInterface {
     protected int x=0;
     protected int y=0;
     protected char color='w';
+    protected Board board;
 
     protected Piece(){}
-    protected Piece(int x, int y, char color){
+    protected Piece(int x, int y, char color, Board board){
         this.x = x;
         this.y = y;
         this.color = color;
+        this.board = board;
     }
     public int[] getPos(){
         return new int[]{x, y};
@@ -27,6 +31,20 @@ public abstract class Piece implements PieceInterface {
     @Override
     public String toString(){
         return getUnicode() + "";
+    }
+
+    public void move(int[] pos) {
+        move(pos[0], pos[1]);
+    }
+
+    public void move(int x, int y) {
+        List<int[]> validMoves = getValidMoves();
+        if (validMoves.contains(new int[]{x, y})){
+            board.setPiece(this.x, this.y, null);
+            this.x = x;
+            this.y = y;
+            board.setPiece(x, y, this);
+        }
     }
 }
 

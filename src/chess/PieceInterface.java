@@ -1,11 +1,14 @@
 package chess;
 
+import java.util.List;
+
 public interface PieceInterface {
 
-    public int[] getPos();
-    public void setPos(int x, int y);
-    public void setPos(int[] pos);
-    public void move(int[] pos);
-    public void move(int x, int y);
-    public char getUnicode();
+     int[] getPos();
+     void setPos(int x, int y);
+     void setPos(int[] pos);
+     void move(int[] pos);
+     void move(int x, int y);
+     char getUnicode();
+     public List<int[]> getValidMoves();
 }
