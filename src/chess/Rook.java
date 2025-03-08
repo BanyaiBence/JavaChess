@@ -20,10 +20,9 @@ public class Rook extends SlidingPiece {
                 new int[] {1, 0}
         });
     }
-    public void move(int x, int y){}
-    public void move(int[] pos){}
+
     public char getUnicode(){
-        return (color == 'w') ? '♖' : '♜';
+        return (color == 'w') ? 'R' : 'r';
     }
 
 }

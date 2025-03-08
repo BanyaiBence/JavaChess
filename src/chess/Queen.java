@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.List;
 
 public class Queen extends SlidingPiece{
 
@@ -29,14 +28,7 @@ public class Queen extends SlidingPiece{
                 new int[] {1, 1}
         });
     }
-    public void move(int[] pos) {
-
-    }
-
-    public void move(int x, int y) {
-
-    }
     public char getUnicode(){
-        return (color == 'w') ? '♕' : '♛';
+        return (color == 'w') ? 'Q' : 'q';
     }
 }

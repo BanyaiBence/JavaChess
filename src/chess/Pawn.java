@@ -11,15 +11,8 @@ public class Pawn extends Piece{
     }
     public Pawn(){}
 
-    public void move(int[] pos) {
-
-    }
-
-    public void move(int x, int y) {
-
-    }
     public char getUnicode(){
-        return (color == 'w') ? '♙' : '♟';
+        return (color == 'w') ? 'P' : 'p';
     }
 
     public List<int[]> getValidMoves() {
@@ -47,6 +40,26 @@ public class Pawn extends Piece{
                 }
             }
         }
+        return moves;
+    }
+
+    public List<int[]> getValidHits(){
+        List<int[]> moves = new ArrayList<>();
+
+        int[][] posS = new int[][]{
+                new int[]{x - 1, color == 'b' ? y+1 : y-1},
+                new int[]{x + 1, color == 'b' ? y+1 : y-1}
+        };
+
+        for (int[] pos : posS){
+            if (!board.validPos(pos)){
+                continue;
+            }
+            Piece piece = board.getPiece(pos[0], pos[1]);
+            moves.add(pos);
+
+        }
+
         return moves;
     }
 }

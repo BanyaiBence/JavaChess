@@ -12,7 +12,7 @@ public class Knight extends Piece{
 
 
     public char getUnicode(){
-        return (color == 'w') ? '♘' : '♞';
+        return (color == 'w') ? 'N' : 'n';
     }
     public List<int[]> getValidMoves(){
         List<int[]> moves = new ArrayList<>();

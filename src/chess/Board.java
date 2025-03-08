@@ -1,33 +1,16 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 // tiles
 public class Board {
     private final Piece[][] tiles = new Piece[8][8];
+    private int[] selected = new int[]{-1, -1};
 
     public Board(){
-        for (int i = 0; i < 8; i++){
-            tiles[1][i] = new Pawn(i, 1, 'b', this);
-            tiles[6][i] = new Pawn(i, 6, 'w', this);
-        }
-        tiles[0][0] = new Rook(0, 0, 'b', this);
-        tiles[0][7] = new Rook(7, 0, 'b', this);
-        tiles[7][0] = new Rook(0, 7, 'w', this);
-        tiles[7][7] = new Rook(7, 7, 'w', this);
-        tiles[0][1] = new Knight(1, 0, 'b', this);
-        tiles[0][6] = new Knight(6, 0, 'b', this);
-        tiles[7][1] = new Knight(1, 7, 'w', this);
-        tiles[7][6] = new Knight(6, 7, 'w', this);
-        tiles[0][2] = new Bishop(2, 0, 'b', this);
-        tiles[0][5] = new Bishop(5, 0, 'b', this);
-        tiles[7][2] = new Bishop(2, 7, 'w', this);
-        tiles[7][5] = new Bishop(5, 7, 'w', this);
-        tiles[0][3] = new Queen(3, 0, 'b', this);
-        tiles[7][3] = new Queen(3, 7, 'w', this);
-        tiles[0][4] = new King(4, 0, 'b', this);
-        tiles[7][4] = new King(4, 7, 'w', this);
-
+        fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
     }
     public Piece getPiece(int x, int y){
         return tiles[y][x];
@@ -36,7 +19,7 @@ public class Board {
     @Override
     public String toString(){
         StringBuilder board = new StringBuilder();
-        board.append("  a  b  c d  e  f g  h\n");
+        board.append("  A B C D E F G H\n");
         for (int i = 0; i < 8; i++){
             board.append(8 - i).append(" ");
             for (int j = 0; j < 8; j++){
@@ -53,7 +36,7 @@ public class Board {
 
     public String showMoves(List<int[]> moves){
         StringBuilder board = new StringBuilder();
-        board.append("  a  b  c d  e  f g  h\n");
+        board.append("  A B C D E F G H\n");
         for (int i = 0; i < 8; i++){
             board.append(8 - i).append(" ");
             for (int j = 0; j < 8; j++){
@@ -65,7 +48,7 @@ public class Board {
                     }
                 }
                 if (contains){
-                    board.append("⬤ ");
+                    board.append("X ");
                 } else if (tiles[i][j] == null){
                     board.append("  ");
                 } else {
@@ -79,6 +62,9 @@ public class Board {
 
     public void setPiece(int x, int y, Piece piece) {
         tiles[y][x] = piece;
+        if (piece != null){
+            piece.setPos(x, y);
+        }
     }
 
     public boolean validPos(int[] pos){
@@ -91,4 +77,152 @@ public class Board {
         pos[1] = pos1[1] + pos2[1];
         return pos;
     }
+
+    public List<int[]> controlledBy(char color){
+        List<int[]> tiles = new ArrayList<>();
+
+        for (Piece[] row : this.tiles){
+            for (Piece piece : row){
+                if (piece == null || piece.color != color){
+                    continue;
+                }
+                if (piece instanceof Pawn){
+                    Pawn pawn = (Pawn) piece;
+                    List<int[]> hits = pawn.getValidHits();
+                    for (int[] hit : hits){
+                        if (!tiles.contains(hit)){
+                            tiles.add(hit);
+                        }
+                    }
+                    continue;
+                }
+                List<int[]> hits = piece.getValidMoves();
+                for (int[] hit : hits){
+                    if (!tiles.contains(hit)){
+                        tiles.add(hit);
+                    }
+                }
+            }
+        }
+
+        return tiles;
+    }
+    public Boolean inCheck(char color){
+        King king = null;
+        for (Piece[] row : tiles){
+            for (Piece piece : row){
+                if (piece instanceof King && piece.color == color){
+                    king = (King) piece;
+                }
+            }
+        }
+        if (king == null){
+            return false;
+        }
+        List<int[]> controlledByOpponent = controlledBy(color == 'w' ? 'b' : 'w');
+
+        if (controlledByOpponent.contains(new int[]{king.x, king.y})){
+            return true;
+        }
+        return false;
+
+    }
+    public void clear(){
+        for (int i = 0; i < tiles.length; i++){
+            Arrays.fill(tiles[i], null);
+        }
+    }
+    public String prepFen(String fen){
+        StringBuilder result = new StringBuilder();
+        for (char c : fen.toCharArray()){
+            if (Character.isDigit(c)){
+                int i = Character.getNumericValue(c);
+                result.append(" ".repeat(i));
+                continue;
+            }
+            result.append(c);
+        }
+        return result.toString();
+    }
+
+    public void fromFen(String fen){
+        clear();
+
+        fen = prepFen(fen);
+
+        String[] rows = fen.split("/");
+        for (int i = 0; i < rows.length; i++){
+            for (int j = 0; j < rows[i].length(); j++){
+
+                char c = rows[i].charAt(j);
+                if (c == ' '){
+                    continue;
+                }
+
+                char color = 'b';
+                if (Character.isUpperCase(c)){
+                    color = 'w';
+                }
+                c = Character.toLowerCase(c);
+
+                switch(Character.toLowerCase(c)){
+                    case 'b':
+                        tiles[i][j] = new Bishop(j, i, color, this);
+                        break;
+                    case 'n':
+                        tiles[i][j] = new Knight(j, i, color, this);
+                        break;
+                    case 'p':
+                        tiles[i][j] = new Pawn(j, i, color, this);
+                        break;
+                    case 'q':
+                        tiles[i][j] = new Queen(j, i, color, this);
+                        break;
+                    case 'r':
+                        tiles[i][j] = new Rook(j, i, color, this);
+                        break;
+                    case 'k':
+                        tiles[i][j] = new King(j, i, color, this);
+                        break;
+                }
+            }
+        }
+    }
+    public void setSelected(int x, int y){
+        selected = new int[]{x, y};
+    }
+    public int[] getSelected(){
+        return selected;
+    }
+
+    public void move(int i, int i1, int x, int y) {
+        Piece piece = getPiece(i, i1);
+        if (piece == null){
+            return;
+        }
+        setPiece(x, y, piece);
+        setPiece(i, i1, null);
+
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
