@@ -7,13 +7,12 @@ import java.util.List;
 // tiles
 public class Board {
     private final Piece[][] tiles = new Piece[8][8];
-    private int[] selected = new int[]{-1, -1};
 
     public Board(){
         fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
     }
-    public Piece getPiece(int x, int y){
-        return tiles[y][x];
+    public Piece getPiece(Vector2D pos){
+        return tiles[pos.y][pos.x];
     }
 
     @Override
@@ -34,70 +33,32 @@ public class Board {
         return board.toString();
     }
 
-    public String showMoves(List<int[]> moves){
-        StringBuilder board = new StringBuilder();
-        board.append("  A B C D E F G H\n");
-        for (int i = 0; i < 8; i++){
-            board.append(8 - i).append(" ");
-            for (int j = 0; j < 8; j++){
-                boolean contains = false;
-                for (int[] move: moves){
-                    if (move[0] == j && move[1] == i){
-                        contains = true;
-                        break;
-                    }
-                }
-                if (contains){
-                    board.append("X ");
-                } else if (tiles[i][j] == null){
-                    board.append("  ");
-                } else {
-                    board.append(tiles[i][j].toString()).append(" ");
-                }
-            }
-            board.append("\n");
-        }
-        return board.toString();
-    }
-
-    public void setPiece(int x, int y, Piece piece) {
-        tiles[y][x] = piece;
+    public void setPiece(Vector2D pos, Piece piece) {
+        tiles[pos.y][pos.x] = piece;
         if (piece != null){
-            piece.setPos(x, y);
+            piece.setPos(pos);
         }
     }
 
-    public boolean validPos(int[] pos){
-        return pos[0] >= 0 && pos[0] <= 7 && pos[1] >= 0 && pos[1] <= 7;
-    }
-
-    public int[] add2Pos(int[] pos1, int[] pos2){
-        int[] pos = new int[2];
-        pos[0] = pos1[0] + pos2[0];
-        pos[1] = pos1[1] + pos2[1];
-        return pos;
-    }
-
-    public List<int[]> controlledBy(char color){
-        List<int[]> tiles = new ArrayList<>();
+    public List<Vector2D> controlledBy(char color){
+        List<Vector2D> tiles = new ArrayList<>();
 
         for (Piece[] row : this.tiles){
             for (Piece piece : row){
                 if (piece == null || piece.color != color){
                     continue;
                 }
-                if (piece instanceof Pawn){
-                    Pawn pawn = (Pawn) piece;
-                    List<int[]> hits = pawn.getValidHits();
-                    for (int[] hit : hits){
+                if (piece instanceof Pawn pawn){
+                    List<Vector2D> hits = pawn.getValidHits();
+                    for (Vector2D hit : hits){
                         if (!tiles.contains(hit)){
                             tiles.add(hit);
                         }
                     }
                     continue;
                 }
-                List<int[]> hits = piece.getValidMoves();
-                for (int[] hit : hits){
+                List<Vector2D> hits = piece.getValidMoves();
+                for (Vector2D hit : hits){
                     if (!tiles.contains(hit)){
                         tiles.add(hit);
                     }
@@ -111,25 +72,22 @@ public class Board {
         King king = null;
         for (Piece[] row : tiles){
             for (Piece piece : row){
-                if (piece instanceof King && piece.color == color){
-                    king = (King) piece;
+                if (piece instanceof King k && piece.color == color){
+                    king = k;
                 }
             }
         }
         if (king == null){
             return false;
         }
-        List<int[]> controlledByOpponent = controlledBy(color == 'w' ? 'b' : 'w');
+        List<Vector2D> controlledByOpponent = controlledBy(color == 'w' ? 'b' : 'w');
 
-        if (controlledByOpponent.contains(new int[]{king.x, king.y})){
-            return true;
-        }
-        return false;
+        return controlledByOpponent.contains(king.pos);
 
     }
     public void clear(){
-        for (int i = 0; i < tiles.length; i++){
-            Arrays.fill(tiles[i], null);
+        for (Piece[] tile : tiles) {
+            Arrays.fill(tile, null);
         }
     }
     public String prepFen(String fen){
@@ -184,26 +142,24 @@ public class Board {
                     case 'k':
                         tiles[i][j] = new King(j, i, color, this);
                         break;
+                    default:
+                        tiles[i][j] = null;
                 }
             }
         }
     }
-    public void setSelected(int x, int y){
-        selected = new int[]{x, y};
-    }
-    public int[] getSelected(){
-        return selected;
-    }
 
-    public void move(int i, int i1, int x, int y) {
-        Piece piece = getPiece(i, i1);
+    public void move(Vector2D start, Vector2D end) {
+        Piece piece = getPiece(start);
         if (piece == null){
             return;
         }
-        setPiece(x, y, piece);
-        setPiece(i, i1, null);
+        setPiece(end, piece);
+        setPiece(start, null);
+    }
 
-
+    public boolean isEmpty(Vector2D pos){
+        return getPiece(pos) == null;
     }
 }
 

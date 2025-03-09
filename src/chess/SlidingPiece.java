@@ -4,36 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SlidingPiece extends Piece {
-    protected final int[][] dirs;
-    public SlidingPiece(int x, int y, char color, Board board, int[][] dirs){
+    protected final Vector2D[] dirs;
+    protected SlidingPiece(int x, int y, char color, Board board, Vector2D[] dirs){
         super(x, y, color, board);
         this.dirs = dirs;
     }
-    public SlidingPiece(int[][] dirs){
-        this.dirs = dirs;
-    }
 
 
-    public List<int[]> getValidMoves(){
-        List<int[]> moves = new ArrayList<>();
+    public List<Vector2D> getValidMoves(){
+        List<Vector2D> moves = new ArrayList<>();
 
-        int[] startPos = new int[]{x, y};
-        for (int[] dir : dirs){
-            int[] pos = board.add2Pos(startPos, dir);
-            while (true){
-                if (!board.validPos(pos)){
-                    break;
-                }
-                Piece piece = board.getPiece(pos[0], pos[1]);
-                if (piece == null){
-                    moves.add(pos);
-                    pos = board.add2Pos(pos, dir);
-                    continue;
-                }
-                if (piece.color != color) {
-                    moves.add(pos);
-                }
-                break;
+        for (Vector2D dir : dirs){
+            Vector2D pos = this.pos.add(dir);
+            while (pos.inBounds() && board.isEmpty(pos)){
+                moves.add(pos);
+                pos = pos.add(dir);
             }
         }
         return moves;

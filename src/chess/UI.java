@@ -6,7 +6,7 @@ import javax.swing.*;
 
 public class UI extends JFrame {
 
-    private BoardPanel board;
+    private final BoardPanel board;
 
 
     public UI(){
@@ -14,7 +14,7 @@ public class UI extends JFrame {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
         setResizable(false);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         board = new BoardPanel();
         this.add(board, BorderLayout.CENTER);
 
@@ -25,6 +25,7 @@ public class UI extends JFrame {
 
     public void run(){
         setVisible(true);
+        board.repaint();
         repaint();
     }
 

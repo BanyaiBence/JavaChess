@@ -1,22 +1,12 @@
 package chess;
 
-import java.util.List;
-
 public class Bishop extends SlidingPiece{
     public Bishop(int x, int y, char color, Board board){
-        super(x, y, color, board, new int[][]{
-                new int[] {-1, -1},
-                new int[] {-1, 1},
-                new int[] {1, -1},
-                new int[] {1, 1}
-        });
-    }
-    public Bishop(){
-        super(new int[][]{
-                new int[] {-1, -1},
-                new int[] {-1, 1},
-                new int[] {1, -1},
-                new int[] {1, 1}
+        super(x, y, color, board, new Vector2D[]{
+                new Vector2D(-1, -1),
+                new Vector2D(-1, 1),
+                new Vector2D(1, -1),
+                new Vector2D(1, 1)
         });
     }
 

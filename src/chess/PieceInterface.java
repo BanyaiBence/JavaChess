@@ -4,11 +4,8 @@ import java.util.List;
 
 public interface PieceInterface {
 
-     int[] getPos();
-     void setPos(int x, int y);
-     void setPos(int[] pos);
-     void move(int[] pos);
-     void move(int x, int y);
+     Vector2D getPos();
+     void setPos(Vector2D pos);
      char getUnicode();
-     public List<int[]> getValidMoves();
+     List<Vector2D> getValidMoves();
 }
