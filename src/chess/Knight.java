@@ -1,9 +1,18 @@
 package chess;
-
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Knight extends Piece{
+    private static final Vector2D[] OFFSETS = {
+            new Vector2D(2, 1),
+            new Vector2D(2, -1),
+            new Vector2D(-2, 1),
+            new Vector2D(-2, -1),
+            new Vector2D(1, 2),
+            new Vector2D(1, -2),
+            new Vector2D(-1, 2),
+            new Vector2D(-1, -2)
+    };
 
     public Knight(int x, int y, char color, Board board){
         super(x, y, color, board);
@@ -13,28 +22,19 @@ public class Knight extends Piece{
         return (color == 'w') ? 'N' : 'n';
     }
 
-    public List<Vector2D> getValidMoves(){
-        List<Vector2D> moves = new ArrayList<>();
+    public List<Vector2D> getMoves(){
+        return Arrays.stream(OFFSETS)
+            .map(this.pos::add)
+            .filter(Vector2D::inBounds)
+            .filter(board::isEmpty)
+            .toList();
+    }
 
-        Vector2D[] offsets = new Vector2D[]{
-                new Vector2D(2, 1),
-                new Vector2D(2, -1),
-                new Vector2D(-2, 1),
-                new Vector2D(-2, -1),
-                new Vector2D(1, 2),
-                new Vector2D(1, -2),
-                new Vector2D(-1, 2),
-                new Vector2D(-1, -2)
-        };
-
-        for (Vector2D offset : offsets){
-            Vector2D pos = this.pos.add(offset);
-            if (!pos.inBounds()){continue;}
-            Piece piece = board.getPiece(pos);
-            if (piece == null || piece.color != this.color){
-                moves.add(pos);
-            }
-        }
-        return moves;
+    public List<Vector2D> getAttacks(){
+        return Arrays.stream(OFFSETS)
+            .map(this.pos::add)
+            .filter(Vector2D::inBounds)
+            .filter(pos -> !board.isEmpty(pos) && board.getPiece(pos).color != color)
+            .toList();
     }
 }

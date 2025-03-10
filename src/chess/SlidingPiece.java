@@ -1,7 +1,7 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public abstract class SlidingPiece extends Piece {
     protected final Vector2D[] dirs;
@@ -10,18 +10,21 @@ public abstract class SlidingPiece extends Piece {
         this.dirs = dirs;
     }
 
+    public List<Vector2D> getMoves(){
+        return Stream.of(dirs)
+            .flatMap(dir ->
+            Stream.iterate(this.pos.add(dir), pos ->
+                pos.inBounds() && board.isEmpty(pos),
+                pos -> pos.add(dir))
+        ).toList();
+    }
 
-    public List<Vector2D> getValidMoves(){
-        List<Vector2D> moves = new ArrayList<>();
-
-        for (Vector2D dir : dirs){
-            Vector2D pos = this.pos.add(dir);
-            while (pos.inBounds() && board.isEmpty(pos)){
-                moves.add(pos);
-                pos = pos.add(dir);
-            }
-        }
-        return moves;
+    public List<Vector2D> getAttacks() {
+        return Stream.of(dirs)
+            .flatMap(dir -> Stream.iterate(this.pos.add(dir), pos -> pos.inBounds() && (board.isEmpty(pos) || board.getPiece(pos).color != this.color), pos -> pos.add(dir))
+            .filter(pos -> !board.isEmpty(pos))
+            .limit(1)
+            ).toList();
     }
 
 }

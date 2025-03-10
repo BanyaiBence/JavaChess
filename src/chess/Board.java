@@ -49,7 +49,7 @@ public class Board {
                     continue;
                 }
                 if (piece instanceof Pawn pawn){
-                    List<Vector2D> hits = pawn.getValidHits();
+                    List<Vector2D> hits = pawn.getAttacks();
                     for (Vector2D hit : hits){
                         if (!tiles.contains(hit)){
                             tiles.add(hit);
@@ -57,7 +57,7 @@ public class Board {
                     }
                     continue;
                 }
-                List<Vector2D> hits = piece.getValidMoves();
+                List<Vector2D> hits = piece.getMoves();
                 for (Vector2D hit : hits){
                     if (!tiles.contains(hit)){
                         tiles.add(hit);

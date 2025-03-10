@@ -2,9 +2,8 @@ package chess;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,90 +14,77 @@ import java.util.Map;
 
 public class BoardPanel extends JPanel {
     public static final int S = 80;
-    private Board game;
+    private final Board board;
     private Vector2D mousePos = new Vector2D(-1, -1);
     private Map<String, BufferedImage> pieceImages;
     private List<Vector2D> moves;
+    private List<Vector2D> attacks;
     private Vector2D selectedPos = new Vector2D(-1, -1);
     private String selectedPiece;
+
 
     public BoardPanel(){
         super();
         setLayout(null);
         setPreferredSize(new Dimension(8 * S, 8 * S));
         setBackground(Color.WHITE);
-        this.game = new Board();
-        this.game.fromFen("rnb1kbnr/pppppppp/8/1N1P1q2/3Q4/6B1/PPPP1PPP/R3KBNR");
+        this.board = new Board();
+        this.board.fromFen("rnb1kbnr/pppppppp/8/1N1P1q2/3Q4/6B1/PPPP1PPP/R3KBNR");
 
         loadPieceImages();
 
-        this.addMouseListener(
-                new MouseListener() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        // unused
-                    }
+        MouseAdapter mouseAdapter = new MouseAdapter(){
 
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        int x = e.getX();
-                        int y = e.getY();
-                        Vector2D mPos = new Vector2D(x, y);
-                        Vector2D pos = mPos.div(S);
-                        if (game.isEmpty(pos)){return;}
-                        Piece piece = game.getPiece(pos);
-                        if (piece == null){return;}
-                        selectedPos = pos;
-                        moves = piece.getValidMoves();
-                        mousePos = mPos;
-                        String color = String.valueOf(piece.color);
-                        String pieceName = piece.getClass().getName().toLowerCase();
-                        pieceName = pieceName.substring(pieceName.lastIndexOf('.') + 1);
-                        selectedPiece = color + "_" + pieceName;
-                    }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int x = e.getX();
+                int y = e.getY();
+                Vector2D mPos = new Vector2D(x, y);
+                Vector2D pos = mPos.div(S);
+                if (board.isEmpty(pos)){return;}
+                Piece piece = board.getPiece(pos);
+                selectedPos = pos;
+                moves = piece.getMoves();
+                attacks = piece.getAttacks();
+                mousePos = mPos;
+                String color = String.valueOf(piece.color);
+                String pieceName = piece.getClass().getName().toLowerCase();
+                pieceName = pieceName.substring(pieceName.lastIndexOf('.') + 1);
+                selectedPiece = color + "_" + pieceName;
+            }
 
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        if (selectedPiece == null){return;}
-                        Vector2D mPos = new Vector2D(e.getX(), e.getY());
-                        Vector2D pos = mPos.div(S);
-
-                        for (Vector2D move: moves){
-                            if (move.equals(pos)){
-                                game.move(selectedPos, pos);
-                                break;
-                            }
-                        }
-                        selectedPiece = null;
-                        selectedPos = new Vector2D(-1, -1);
-                        moves = null;
-                        repaint();
-                    }
-
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        // unused
-                    }
-
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                        // unused
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                Vector2D mPos = new Vector2D(e.getX(), e.getY());
+                Vector2D pos = mPos.div(S);
+                for (Vector2D move: moves){
+                    if (move.equals(pos)){
+                        board.move(selectedPos, pos);
+                        break;
                     }
                 }
-        );
-        this.addMouseMotionListener(new MouseMotionListener() {
+                for (Vector2D attack: attacks){
+                    if (attack.equals(pos)){
+                        board.move(selectedPos, pos);
+                        break;
+                    }
+                }
+                selectedPiece = null;
+                selectedPos = new Vector2D(-1, -1);
+                moves = null;
+                attacks = null;
+                repaint();
+            }
+
             @Override
             public void mouseDragged(MouseEvent e) {
                 mousePos = new Vector2D(e.getX(), e.getY());
                 repaint();
             }
+        };
 
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                // unused
-            }
-        });
-
+        addMouseListener(mouseAdapter);
+        addMouseMotionListener(mouseAdapter);
 
     }
 
@@ -114,14 +100,12 @@ public class BoardPanel extends JPanel {
                 e.printStackTrace();
             }
         }
-
-
     }
 
     private void drawPiece(Graphics g, Vector2D pos){
-        Piece piece = game.getPiece(pos);
+        Piece piece = board.getPiece(pos);
         if (piece != null){
-            String color = piece.color == 'w' ? "w" : "b";
+            String color = String.valueOf(piece.color);
             String pieceName = piece.getClass().getName().toLowerCase();
             pieceName = pieceName.substring(pieceName.lastIndexOf('.') + 1);
 
@@ -139,6 +123,14 @@ public class BoardPanel extends JPanel {
         g.setColor(Color.YELLOW);
         for (Vector2D move: moves){
             g.fillRect(move.x * S + 10, move.y * S + 10, S -20, S -20);
+        }
+    }
+    private void drawAttacks(Graphics g){
+        if (selectedPos.x == -1){return;}
+
+        g.setColor(Color.RED);
+        for (Vector2D attack: attacks){
+            g.fillRect(attack.x * S + 10, attack.y * S + 10, S -20, S -20);
         }
     }
     private void drawPieces(Graphics g){
@@ -169,6 +161,7 @@ public class BoardPanel extends JPanel {
         super.paintComponent(g);
         drawBoard(g);
         drawMoves(g);
+        drawAttacks(g);
         drawPieces(g);
         drawSelected(g);
     }

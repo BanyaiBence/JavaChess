@@ -17,9 +17,6 @@ public abstract class Piece implements PieceInterface {
         return pos;
     }
     public void setPos(Vector2D pos){
-        if (pos.x < 0 || pos.x > 7 || pos.y < 0 || pos.y > 7){
-            throw new IllegalArgumentException("X and Y must be between 0 and 7");
-        }
         this.pos = pos;
     }
     @Override

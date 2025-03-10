@@ -13,28 +13,30 @@ public class Pawn extends Piece{
         return (color == 'w') ? 'P' : 'p';
     }
 
-    public List<Vector2D> getValidMoves() {
+    public List<Vector2D> getMoves() {
         List<Vector2D> moves = new ArrayList<>();
-        Vector2D pos = this.pos.add(0, color == 'b' ? 1 : -1);
+        int dir = (color == 'b') ? 1 : -1;
+
+        Vector2D pos = this.pos.add(0, dir);
 
         if (!pos.inBounds() || !board.isEmpty(pos)){return moves;}
-        moves.add(pos);
 
-        if (!(this.color == 'w' && this.pos.y == 1) && !(this.color == 'b' && this.pos.y == 6)){
-            return moves;
-        }
-        pos = this.pos.add(0, color == 'b' ? 2 : -2);
-        if (board.isEmpty(pos)){
-            moves.add(pos);
+        moves.add(pos);
+        if ((this.color == 'w' && this.pos.y == 6) || (this.color == 'b' && this.pos.y == 1)){
+            pos = this.pos.add(0, 2*dir);
+            if (board.isEmpty(pos)){
+                moves.add(pos);
+            }
         }
         return moves;
     }
 
-    public List<Vector2D> getValidHits(){
+    public List<Vector2D> getAttacks(){
         List<Vector2D> hits = new ArrayList<>();
+        int dir = (color == 'b') ? 1 : -1;
 
-        Vector2D pos1 = this.pos.add(-1, color == 'b' ? 1 : -1);
-        Vector2D pos2 = this.pos.add(1, color == 'b' ? 1 : -1);
+        Vector2D pos1 = this.pos.add(-1, dir);
+        Vector2D pos2 = this.pos.add(1,  dir);
 
         if (pos1.inBounds() && !board.isEmpty(pos1) && board.getPiece(pos1).color != this.color){
             hits.add(pos1);

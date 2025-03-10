@@ -7,5 +7,6 @@ public interface PieceInterface {
      Vector2D getPos();
      void setPos(Vector2D pos);
      char getUnicode();
-     List<Vector2D> getValidMoves();
+     List<Vector2D> getMoves();
+        List<Vector2D> getAttacks();
 }
