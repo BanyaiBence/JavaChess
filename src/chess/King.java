@@ -26,6 +26,7 @@ public class King extends Piece{
                 .map(this.pos::add)
                 .filter(Vector2D::inBounds)
                 .filter(board::isEmpty)
+                .filter(pos -> board.isSafeMove(this.pos, pos))
                 .toList();
     }
     public List<Vector2D> getAttacks(){
@@ -34,6 +35,13 @@ public class King extends Piece{
                 .filter(Vector2D::inBounds)
                 .filter(pos -> !board.isEmpty(pos))
                 .filter(pos -> board.getPiece(pos).color != color)
+                .filter(pos -> board.isSafeMove(this.pos, pos))
+                .toList();
+    }
+    public List<Vector2D> getControlled(){
+        return Arrays.stream(OFFSETS)
+                .map(this.pos::add)
+                .filter(Vector2D::inBounds)
                 .toList();
     }
 }

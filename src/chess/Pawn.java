@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Pawn extends Piece{
@@ -20,7 +21,6 @@ public class Pawn extends Piece{
         Vector2D pos = this.pos.add(0, dir);
 
         if (!pos.inBounds() || !board.isEmpty(pos)){return moves;}
-
         moves.add(pos);
         if ((this.color == 'w' && this.pos.y == 6) || (this.color == 'b' && this.pos.y == 1)){
             pos = this.pos.add(0, 2*dir);
@@ -45,5 +45,21 @@ public class Pawn extends Piece{
             hits.add(pos2);
         }
         return hits;
+    }
+
+    public List<Vector2D> getControlled(){
+        List<Vector2D> result = new ArrayList<>();
+        int dir = (color == 'b') ? 1 : -1;
+
+        Vector2D pos1 = this.pos.add(-1, dir);
+        Vector2D pos2 = this.pos.add(1,  dir);
+
+        if (pos1.inBounds()){
+            result.add(pos1);
+        }
+        if (pos2.inBounds()){
+            result.add(pos2);
+        }
+        return result;
     }
 }

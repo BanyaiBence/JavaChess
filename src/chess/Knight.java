@@ -37,4 +37,11 @@ public class Knight extends Piece{
             .filter(pos -> !board.isEmpty(pos) && board.getPiece(pos).color != color)
             .toList();
     }
+
+    public List<Vector2D> getControlled(){
+        return Arrays.stream(OFFSETS)
+            .map(this.pos::add)
+            .filter(Vector2D::inBounds)
+            .toList();
+    }
 }

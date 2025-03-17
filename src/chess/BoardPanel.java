@@ -4,13 +4,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import java.text.AttributedString;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.sun.java.accessibility.util.AWTEventMonitor.addWindowListener;
 
 public class BoardPanel extends JPanel {
     public static final int S = 80;
@@ -44,8 +50,10 @@ public class BoardPanel extends JPanel {
                 if (board.isEmpty(pos)){return;}
                 Piece piece = board.getPiece(pos);
                 selectedPos = pos;
-                moves = piece.getMoves();
-                attacks = piece.getAttacks();
+
+                moves = piece.getMoves().stream().filter(p->board.isSafeMove(pos, p)).toList();
+                attacks = piece.getAttacks().stream().filter(p->board.isSafeMove(pos, p)).toList();
+
                 mousePos = mPos;
                 String color = String.valueOf(piece.color);
                 String pieceName = piece.getClass().getName().toLowerCase();
@@ -87,6 +95,9 @@ public class BoardPanel extends JPanel {
         addMouseMotionListener(mouseAdapter);
 
     }
+    public List<String> getHistory(){
+        return board.getHistory();
+    }
 
     private void loadPieceImages() {
         pieceImages = new HashMap<>();
@@ -114,6 +125,28 @@ public class BoardPanel extends JPanel {
 
         }
     }
+    private void drawDebug(Graphics g){
+        List<Vector2D> cByW = board.controlledBy('w');
+        List<Vector2D> cByB = board.controlledBy('b');
+
+        Font font = new Font("Arial", Font.PLAIN, 15);
+
+        AttributedString w = new AttributedString("W");
+        w.addAttribute(TextAttribute.FOREGROUND, Color.ORANGE);
+        w.addAttribute(TextAttribute.FONT, font);
+        AttributedString b = new AttributedString("B");
+        b.addAttribute(TextAttribute.FOREGROUND, Color.ORANGE);
+        b.addAttribute(TextAttribute.FONT, font);
+
+
+        for (Vector2D pos: cByW){
+            g.drawString(w.getIterator(), pos.x * S + 5, pos.y * S + 20);
+        }
+        for (Vector2D pos: cByB) {
+            g.drawString(b.getIterator(), pos.x * S + 25, pos.y * S + 20);
+        }
+    }
+
     private void drawMoves(Graphics g){
         if (selectedPos.x == -1){return;}
 
@@ -165,4 +198,5 @@ public class BoardPanel extends JPanel {
         drawPieces(g);
         drawSelected(g);
     }
+
 }

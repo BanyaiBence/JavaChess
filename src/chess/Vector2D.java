@@ -33,8 +33,14 @@ public class Vector2D {
         return new Vector2D(x / scalar, y / scalar);
     }
 
-    public boolean equals(Vector2D other){
+    @Override
+    public boolean equals(Object obj){
+        if (!(obj instanceof Vector2D other)){return false;}
         return x == other.x && y == other.y;
+    }
+    @Override
+    public int hashCode() {
+        return y*8 + x;
     }
 
     public String toString(){
