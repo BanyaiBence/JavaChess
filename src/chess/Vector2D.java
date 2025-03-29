@@ -49,4 +49,9 @@ public class Vector2D {
     public boolean inBounds(){
         return x >= 0 && x <= 7 && y >= 0 && y <= 7;
     }
+
+    public static Vector2D fromNotation(String notation){
+        char file = Character.toUpperCase(notation.charAt(0));
+        return new Vector2D(file - 'A', '8' - notation.charAt(1));
+    }
 }

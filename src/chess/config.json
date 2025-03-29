@@ -1,0 +1,26 @@
+{
+    "board": {
+      "square_size": 100
+    },
+    "debug": {
+      "enabled": true,
+      "show_controls": true,
+      "show_notation": true,
+      "show_console_mode": true,
+      "show_turn": true
+    },
+    "console": {
+      "enabled": true
+    },
+    "color_schemes": {
+      "classic": {
+        "light": "#f0d9b5",
+        "dark": "#b58863",
+        "move": "#f0d9b5",
+        "capture": "#f0d9b5",
+        "check": "#f0d9b5",
+        "checkmate": "#f0d9b5",
+        "text": "#000000"
+      }
+    },
+}

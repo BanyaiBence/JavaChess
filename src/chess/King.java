@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class King extends Piece{
     public char getUnicode(){
         return (color == 'w') ? 'K' : 'k';
     }
+
     public List<Vector2D> getMoves(){
         return Arrays.stream(OFFSETS)
                 .map(this.pos::add)
@@ -44,4 +46,5 @@ public class King extends Piece{
                 .filter(Vector2D::inBounds)
                 .toList();
     }
+
 }

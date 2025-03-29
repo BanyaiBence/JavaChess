@@ -3,7 +3,8 @@ package chess;
 public class Main {
 
     public static void main(String[] args){
-        UI ui = new UI();
+        Config config = new Config();
+        UI ui = new UI(config);
         ui.run();
     }
 }

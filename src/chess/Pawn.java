@@ -44,6 +44,13 @@ public class Pawn extends Piece{
         if (pos2.inBounds() && !board.isEmpty(pos2) && board.getPiece(pos2).color != this.color){
             hits.add(pos2);
         }
+        if (pos1.equals(board.getEnPassant())){
+            hits.add(pos1);
+        }
+
+        if (pos2.equals(board.getEnPassant())){
+            hits.add(pos2);
+        }
         return hits;
     }
 

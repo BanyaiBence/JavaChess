@@ -24,7 +24,9 @@ public abstract class SlidingPiece extends Piece {
 
     public List<Vector2D> getAttacks() {
         return Stream.of(dirs)
-            .flatMap(dir -> Stream.iterate(this.pos.add(dir), pos -> pos.inBounds() && (board.isEmpty(pos) || board.getPiece(pos).color != this.color), pos -> pos.add(dir))
+            .flatMap(dir -> Stream.iterate(this.pos.add(dir),
+                    pos -> pos.inBounds() && (board.isEmpty(pos) || board.getPiece(pos).color != this.color),
+                    pos -> pos.add(dir))
             .filter(pos -> !board.isEmpty(pos))
             .limit(1)
             ).toList();
